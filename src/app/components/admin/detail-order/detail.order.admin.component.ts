@@ -11,7 +11,8 @@ import { environment } from '../../../../environments/environment';
 import { OrderDTO } from '../../../dtos/order/order.dto';
 import { OrderResponse } from '../../../responses/order/order.response';
 import { OrderService } from '../../../services/order.service';
-
+import { ApiResponse } from '../../../responses/api.response';
+import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-detail-order-admin',
@@ -58,8 +59,9 @@ export class DetailOrderAdminComponent implements OnInit{
     debugger
     this.orderId = Number(this.route.snapshot.paramMap.get('id'));
     this.orderService.getOrderById(this.orderId).subscribe({
-      next: (response: any) => {        
+      next: (apiResponse: ApiResponse) => {        
         debugger;       
+        const response = apiResponse.data    
         this.orderResponse.id = response.id;
         this.orderResponse.user_id = response.user_id;
         this.orderResponse.fullname = response.fullname;
@@ -97,10 +99,10 @@ export class DetailOrderAdminComponent implements OnInit{
       complete: () => {
         debugger;        
       },
-      error: (error: any) => {
+      error: (error: HttpErrorResponse) => {
         debugger;
-        console.error('Error fetching detail:', error);
-      },
+        console.error(error?.error?.message ?? '');
+      } 
     });
   }    
   
@@ -109,7 +111,7 @@ export class DetailOrderAdminComponent implements OnInit{
     this.orderService
       .updateOrder(this.orderId, new OrderDTO(this.orderResponse))
       .subscribe({
-      next: (response: Object) => {
+      next: (response: ApiResponse) => {
         debugger
         // Handle the successful update
         //console.log('Order updated successfully:', response);
@@ -120,12 +122,11 @@ export class DetailOrderAdminComponent implements OnInit{
       complete: () => {
         debugger;        
       },
-      error: (error: any) => {
-        // Handle the error
-        debugger
-        console.error('Error updating order:', error);
+      error: (error: HttpErrorResponse) => {
+        debugger;
+        console.error(error?.error?.message ?? '');
         this.router.navigate(['../'], { relativeTo: this.route });
-      }
+      }       
     });   
   }
 }

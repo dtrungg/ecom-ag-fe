@@ -2,9 +2,11 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Category } from '../../../models/category';
 import { CategoryService } from '../../../services/category.service';
+import { ApiResponse } from '../../../responses/api.response';
 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 
 
 @Component({
@@ -31,15 +33,16 @@ export class CategoryAdminComponent implements OnInit {
     }
     getCategories(page: number, limit: number) {
       this.categoryService.getCategories(page, limit).subscribe({
-        next: (categories: Category[]) => {
+        next: (apiResponse: ApiResponse) => {
           debugger;
-          this.categories = categories;
+          this.categories = apiResponse.data;
         },
         complete: () => {
           debugger;
         },
-        error: (error: any) => {
-          console.error('Error fetching categories:', error);
+        error: (error: HttpErrorResponse) => {
+          debugger;
+          console.error(error?.error?.message ?? '');
         }
       });
     }
@@ -60,19 +63,18 @@ export class CategoryAdminComponent implements OnInit {
       if (confirmation) {
         debugger
         this.categoryService.deleteCategory(category.id).subscribe({
-          next: (response: string) => {
+          next: (apiResponse: ApiResponse) => {
             debugger 
-            alert('Xóa thành công')
+            console.error('Xóa thành công')
             location.reload();          
           },
           complete: () => {
             debugger;          
           },
-          error: (error: any) => {
+          error: (error: HttpErrorResponse) => {
             debugger;
-            alert(error.error)
-            console.error('Error fetching categories:', error);
-          }
+            console.error(error?.error?.message ?? '');
+          }          
         });  
       }      
     }

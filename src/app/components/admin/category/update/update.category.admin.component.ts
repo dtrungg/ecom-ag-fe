@@ -5,6 +5,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { UpdateCategoryDTO } from '../../../../dtos/category/update.category.dto';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ApiResponse } from '../../../../responses/api.response';
+import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-detail.category.admin',
@@ -42,15 +44,16 @@ export class UpdateCategoryAdminComponent implements OnInit {
   
   getCategoryDetails(): void {
     this.categoryService.getDetailCategory(this.categoryId).subscribe({
-      next: (category: Category) => {        
-        this.updatedCategory = { ...category };                        
+      next: (apiResponse: ApiResponse) => {        
+        this.updatedCategory = { ...apiResponse.data };                        
       },
       complete: () => {
         
       },
-      error: (error: any) => {
-        
-      }
+      error: (error: HttpErrorResponse) => {
+        debugger;
+        console.error(error?.error?.message ?? '');
+      } 
     });     
   }
   updateCategory() {
@@ -66,10 +69,10 @@ export class UpdateCategoryAdminComponent implements OnInit {
         debugger;
         this.router.navigate(['/admin/categories']);        
       },
-      error: (error: any) => {
+      error: (error: HttpErrorResponse) => {
         debugger;
-        console.error('Error fetching categorys:', error);
-      }
+        console.error(error?.error?.message ?? '');
+      } 
     });  
   }  
 }

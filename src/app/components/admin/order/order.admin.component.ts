@@ -9,6 +9,8 @@ import { OrderResponse } from '../../../responses/order/order.response';
 import { OrderService } from '../../../services/order.service';
 import { CommonModule,DOCUMENT } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ApiResponse } from '../../../responses/api.response';
+import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-order-admin',
@@ -54,18 +56,18 @@ export class OrderAdminComponent implements OnInit{
   getAllOrders(keyword: string, page: number, limit: number) {
     debugger
     this.orderService.getAllOrders(keyword, page, limit).subscribe({
-      next: (response: any) => {
+      next: (apiResponse: ApiResponse) => {
         debugger        
-        this.orders = response.orders;
-        this.totalPages = response.totalPages;
+        this.orders = apiResponse.data.orders;
+        this.totalPages = apiResponse.data.totalPages;
         this.visiblePages = this.generateVisiblePageArray(this.currentPage, this.totalPages);
       },
       complete: () => {
         debugger;
       },
-      error: (error: any) => {
+      error: (error: HttpErrorResponse) => {
         debugger;
-        console.error('Error fetching products:', error);
+        console.error(error?.error?.message ?? '');
       }
     });    
   }
@@ -97,16 +99,16 @@ export class OrderAdminComponent implements OnInit{
     if (confirmation) {
       debugger
       this.orderService.deleteOrder(id).subscribe({
-        next: (response: any) => {
+        next: (response: ApiResponse) => {
           debugger 
           location.reload();          
         },
         complete: () => {
           debugger;          
         },
-        error: (error: any) => {
+        error: (error: HttpErrorResponse) => {
           debugger;
-          console.error('Error fetching products:', error);
+          console.error(error?.error?.message ?? '');
         }
       });    
     }

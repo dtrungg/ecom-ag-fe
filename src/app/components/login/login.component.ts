@@ -14,6 +14,8 @@ import { HeaderComponent } from '../header/header.component';
 import { FooterComponent } from '../footer/footer.component';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ApiResponse } from '../../responses/api.response';
+import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-login',
@@ -71,18 +73,19 @@ export class LoginComponent implements OnInit{
     // Gọi API lấy danh sách roles và lưu vào biến roles
     debugger
     this.roleService.getRoles().subscribe({      
-      next: (roles: Role[]) => { // Sử dụng kiểu Role[]
+      next: (apiResponse: ApiResponse) => { // Sử dụng kiểu Role[]
         debugger
+        const roles = apiResponse.data
         this.roles = roles;
         this.selectedRole = roles.length > 0 ? roles[0] : undefined;
       },
       complete: () => {
         debugger
       },  
-      error: (error: any) => {
-        debugger
-        console.error('Error getting roles:', error);
-      }
+      error: (error: HttpErrorResponse) => {
+        debugger;
+        console.error(error?.error?.message ?? '');
+      } 
     });
   }
   createAccount() {
@@ -93,7 +96,7 @@ export class LoginComponent implements OnInit{
   login() {
     const message = `phone: ${this.phoneNumber}` +
       `password: ${this.password}`;
-    //alert(message);
+    //console.error(message);
     debugger
 
     const loginDTO: LoginDTO = {
@@ -102,18 +105,18 @@ export class LoginComponent implements OnInit{
       role_id: this.selectedRole?.id ?? 1
     };
     this.userService.login(loginDTO).subscribe({
-      next: (response: LoginResponse) => {
+      next: (apiResponse: ApiResponse) => {
         debugger;
-        const { token } = response;
+        const { token } = apiResponse.data;
         if (this.rememberMe) {          
           this.tokenService.setToken(token);
           debugger;
           this.userService.getUserDetail(token).subscribe({
-            next: (response: any) => {
+            next: (apiResponse2: ApiResponse) => {
               debugger
               this.userResponse = {
-                ...response,
-                date_of_birth: new Date(response.date_of_birth),
+                ...apiResponse2.data,
+                date_of_birth: new Date(apiResponse2.data.date_of_birth),
               };    
               this.userService.saveUserResponseToLocalStorage(this.userResponse); 
               if(this.userResponse?.role.name == 'admin') {
@@ -127,20 +130,20 @@ export class LoginComponent implements OnInit{
               this.cartService.refreshCart();
               debugger;
             },
-            error: (error: any) => {
+            error: (error: HttpErrorResponse) => {
               debugger;
-              alert(error.error.message);
-            }
+              console.error(error?.error?.message ?? '');
+            } 
           })
         }                        
       },
       complete: () => {
         debugger;
       },
-      error: (error: any) => {
+      error: (error: HttpErrorResponse) => {
         debugger;
-        alert(error.error.message);
-      }
+        console.error(error?.error?.message ?? '');
+      } 
     });
   }
   togglePassword() {

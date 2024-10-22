@@ -10,6 +10,8 @@ import { ProductImage } from '../../../../models/product.image';
 import { UpdateProductDTO } from '../../../../dtos/product/update.product.dto';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ApiResponse } from '../../../../responses/api.response';
+import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-detail.product.admin',
@@ -51,23 +53,25 @@ export class UpdateProductAdminComponent implements OnInit {
   }
   getCategories(page: number, limit: number) {
     this.categoryService.getCategories(page, limit).subscribe({
-      next: (categories: Category[]) => {
-        debugger
-        this.categories = categories;
+      next: (apiResponse: ApiResponse) => {
+        debugger;
+        this.categories = apiResponse.data;
       },
       complete: () => {
         debugger;
       },
-      error: (error: any) => {
-        console.error('Error fetching categories:', error);
-      }
+      error: (error: HttpErrorResponse) => {
+        debugger;
+        console.error(error?.error?.message ?? '');
+      } 
     });
   }
   getProductDetails(): void {
     this.productService.getDetailProduct(this.productId).subscribe({
-      next: (product: Product) => {
-        this.product = product;
-        this.updatedProduct = { ...product };                
+      next: (apiResponse: ApiResponse) => {
+
+        this.product = apiResponse.data;
+        this.updatedProduct = { ...apiResponse.data };                
         this.updatedProduct.product_images.forEach((product_image:ProductImage) => {
           product_image.image_url = `${environment.apiBaseUrl}/products/images/${product_image.image_url}`;
         });
@@ -75,9 +79,10 @@ export class UpdateProductAdminComponent implements OnInit {
       complete: () => {
         
       },
-      error: (error: any) => {
-        
-      }
+      error: (error: HttpErrorResponse) => {
+        debugger;
+        console.error(error?.error?.message ?? '');
+      } 
     });     
   }
   updateProduct() {
@@ -89,17 +94,17 @@ export class UpdateProductAdminComponent implements OnInit {
       category_id: this.updatedProduct.category_id
     };
     this.productService.updateProduct(this.product.id, updateProductDTO).subscribe({
-      next: (response: any) => {  
+      next: (apiResponse: ApiResponse) => {  
         debugger        
       },
       complete: () => {
         debugger;
         this.router.navigate(['/admin/products']);        
       },
-      error: (error: any) => {
+      error: (error: HttpErrorResponse) => {
         debugger;
-        console.error('Error fetching products:', error);
-      }
+        console.error(error?.error?.message ?? '');
+      } 
     });  
   }
   showImage(index: number): void {
@@ -135,25 +140,24 @@ export class UpdateProductAdminComponent implements OnInit {
     const files = event.target.files;
     // Limit the number of selected files to 5
     if (files.length > 5) {
-      alert('Please select a maximum of 5 images.');
+      console.error('Please select a maximum of 5 images.');
       return;
     }
     // Store the selected files in the newProduct object
     this.images = files;
     this.productService.uploadImages(this.productId, this.images).subscribe({
-      next: (imageResponse) => {
+      next: (apiResponse: ApiResponse) => {
         debugger
         // Handle the uploaded images response if needed              
-        console.log('Images uploaded successfully:', imageResponse);
+        console.log('Images uploaded successfully:', apiResponse);
         this.images = [];       
         // Reload product details to reflect the new images
         this.getProductDetails(); 
       },
-      error: (error) => {
-        // Handle the error while uploading images
-        alert(error.error)
-        console.error('Error uploading images:', error);
-      }
+      error: (error: HttpErrorResponse) => {
+        debugger;
+        console.error(error?.error?.message ?? '');
+      } 
     })
   }
   deleteImage(productImage: ProductImage) {
@@ -163,11 +167,10 @@ export class UpdateProductAdminComponent implements OnInit {
         next:(productImage: ProductImage) => {
           location.reload();          
         },        
-        error: (error) => {
-          // Handle the error while uploading images
-          alert(error.error)
-          console.error('Error deleting images:', error);
-        }
+        error: (error: HttpErrorResponse) => {
+          debugger;
+          console.error(error?.error?.message ?? '');
+        } 
       });
     }   
   }

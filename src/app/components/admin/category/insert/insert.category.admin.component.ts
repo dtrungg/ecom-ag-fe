@@ -7,7 +7,7 @@ import { CategoryService } from '../../../../services/category.service';
 import { ProductService } from '../../../../services/product.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-
+import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-insert.category.admin',
@@ -42,12 +42,10 @@ export class InsertCategoryAdminComponent implements OnInit {
         debugger
         this.router.navigate(['/admin/categories']);        
       },
-      error: (error) => {
-        debugger
-        // Handle error while inserting the category
-        alert(error.error)
-        console.error('Error inserting category:', error);
-      }
+      error: (error: HttpErrorResponse) => {
+        debugger;
+        console.error(error?.error?.message ?? '');
+      }        
     });    
   }
 }

@@ -18,7 +18,7 @@ import { HeaderComponent } from '../header/header.component';
 import { FooterComponent } from '../footer/footer.component';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-
+import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'user-profile',
@@ -75,9 +75,9 @@ export class UserProfileComponent implements OnInit {
       complete: () => {
         debugger;
       },
-      error: (error: any) => {
+      error: (error: HttpErrorResponse) => {
         debugger;
-        alert(error.error.message);
+        console.error(error?.error?.message ?? '');
       }
     })
   }
@@ -110,13 +110,14 @@ export class UserProfileComponent implements OnInit {
             this.tokenService.removeToken();
             this.router.navigate(['/login']);
           },
-          error: (error: any) => {
-            alert(error.error.message);
-          }
+          error: (error: HttpErrorResponse) => {
+            debugger;
+            console.error(error?.error?.message ?? '');
+          } 
         });
     } else {
       if (this.userProfileForm.hasError('passwordMismatch')) {        
-        alert('Mật khẩu và mật khẩu gõ lại chưa chính xác')
+        console.error('Mật khẩu và mật khẩu gõ lại chưa chính xác')
       }
     }
   }    

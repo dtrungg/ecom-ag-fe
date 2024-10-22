@@ -42,7 +42,7 @@ export class HeaderComponent implements OnInit{
   }
 
   handleItemClick(index: number): void {
-    //alert(`Clicked on "${index}"`);
+    //console.error(`Clicked on "${index}"`);
     if(index === 0) {
       debugger
       this.router.navigate(['/user-profile']);                      
@@ -57,6 +57,6 @@ export class HeaderComponent implements OnInit{
   
   setActiveNavItem(index: number) {    
     this.activeNavItem = index;
-    //alert(this.activeNavItem);
+    //console.error(this.activeNavItem);
   }  
 }

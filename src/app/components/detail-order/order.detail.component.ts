@@ -11,7 +11,8 @@ import { OrderDetail } from '../../models/order.detail';
 import { FooterComponent } from '../footer/footer.component';
 import { HeaderComponent } from '../header/header.component';
 import { CommonModule } from '@angular/common';
-
+import { ApiResponse } from '../../responses/api.response';
+import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-order-detail',
@@ -55,8 +56,9 @@ export class OrderDetailComponent implements OnInit {
     debugger
     const orderId = Number(this.route.snapshot.paramMap.get('orderId'));
     this.orderService.getOrderById(orderId).subscribe({
-      next: (response: any) => {        
-        debugger;       
+      next: (apiResponse: ApiResponse) => {        
+        debugger;   
+        const response = apiResponse.data    
         this.orderResponse.id = response.id;
         this.orderResponse.user_id = response.user_id;
         this.orderResponse.fullname = response.fullname;
@@ -90,10 +92,10 @@ export class OrderDetailComponent implements OnInit {
       complete: () => {
         debugger;        
       },
-      error: (error: any) => {
+      error: (error: HttpErrorResponse) => {
         debugger;
-        console.error('Error fetching detail:', error);
-      }
+        console.error(error?.error?.message ?? '');
+      } 
     });
   }
 }

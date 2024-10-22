@@ -7,6 +7,9 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HeaderComponent } from '../header/header.component';
 import { FooterComponent } from '../footer/footer.component';
+import { ApiResponse } from '../../responses/api.response';
+import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
+
 @Component({
   selector: 'app-register',
   templateUrl: './register.component.html',
@@ -56,7 +59,7 @@ export class RegisterComponent {
                     `fullName: ${this.fullName}`+
                     `isAccepted: ${this.isAccepted}`+
                     `dateOfBirth: ${this.dateOfBirth}`;
-    //alert(message);
+    //console.error(message);
     debugger
     
     const registerDTO:RegisterDTO = {
@@ -71,7 +74,7 @@ export class RegisterComponent {
         "role_id": 1
     }
     this.userService.register(registerDTO).subscribe({
-        next: (response: any) => {
+        next: (apiResponse: ApiResponse) => {
           debugger
           const confirmation = window
             .confirm('Đăng ký thành công, mời bạn đăng nhập. Bấm "OK" để chuyển đến trang đăng nhập.');
@@ -82,10 +85,10 @@ export class RegisterComponent {
         complete: () => {
           debugger
         },
-        error: (error: any) => {        
-          debugger  
-          alert(error?.error?.message ?? '')          
-        }
+        error: (error: HttpErrorResponse) => {
+          debugger;
+          console.error(error?.error?.message ?? '');
+        } 
     })   
   }
   togglePassword() {

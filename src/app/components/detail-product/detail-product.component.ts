@@ -9,6 +9,8 @@ import { HeaderComponent } from '../header/header.component';
 import { FooterComponent } from '../footer/footer.component';
 import { CommonModule } from '@angular/common';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { ApiResponse } from '../../responses/api.response';
+import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 
 
 @Component({
@@ -51,8 +53,9 @@ export class DetailProductComponent implements OnInit {
       }
       if (!isNaN(this.productId)) {
         this.productService.getDetailProduct(this.productId).subscribe({
-          next: (response: any) => {            
+          next: (apiResponse: ApiResponse) => {            
             // Lấy danh sách ảnh sản phẩm và thay đổi URL
+            const response = apiResponse.data
             debugger
             if (response.product_images && response.product_images.length > 0) {
               response.product_images.forEach((product_image:ProductImage) => {
@@ -67,9 +70,9 @@ export class DetailProductComponent implements OnInit {
           complete: () => {
             debugger;
           },
-          error: (error: any) => {
+          error: (error: HttpErrorResponse) => {
             debugger;
-            console.error('Error fetching detail:', error);
+            console.error(error?.error?.message ?? '');
           }
         });    
       } else {
